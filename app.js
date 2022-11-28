@@ -4,6 +4,8 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
 const _ = require("lodash");
+const date = require(__dirname + "/date.js");
+const day = date.getDate();
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -23,18 +25,26 @@ const Item = mongoose.model("Item", itemsSchema);
 
 
 const item1 = new Item({
-  name: "Welcome to your todolist!"
+  name: "Welcome to todolist!"
 });
 
 const item2 = new Item({
-  name: "Hit the + button to add a new item."
+  name: "Click the + button to add a new item."
 });
 
 const item3 = new Item({
-  name: "<-- Hit this to delete an item."
+  name: "<-- Click this to delete an item."
 });
 
-const defaultItems = [item1, item2, item3];
+const item4 = new Item({
+  name: "Create your own todolist like below."
+});
+
+const item5 = new Item({
+  name: "www.e.com/yourname groceriesList"
+});
+
+const defaultItems = [item1, item2, item4, item5, item3];
 
 const listSchema = {
   name: String,
@@ -46,6 +56,7 @@ const List = mongoose.model("List", listSchema);
 
 app.get("/", function (req, res) {
 
+
   Item.find({}, function (err, foundItems) {
 
     if (foundItems.length === 0) {
@@ -53,12 +64,12 @@ app.get("/", function (req, res) {
         if (err) {
           console.log(err);
         } else {
-          console.log("Successfully saved default items to DB.");
+          // console.log("Successfully saved default items to DB.");
         }
       });
       res.redirect("/");
     } else {
-      res.render("list", { listTitle: "Today", newListItems: foundItems });
+      res.render("list", { listTitle: day, newListItems: foundItems });
     }
   });
 
@@ -97,7 +108,7 @@ app.post("/", function (req, res) {
     name: itemName
   });
 
-  if (listName === "Today") {
+  if (listName === day) {
     item.save();
     res.redirect("/");
   } else {
@@ -113,10 +124,10 @@ app.post("/delete", function (req, res) {
   const checkedItemId = req.body.checkbox;
   const listName = req.body.listName;
 
-  if (listName === "Today") {
+  if (listName === day) {
     Item.findByIdAndRemove(checkedItemId, function (err) {
       if (!err) {
-        console.log("Successfully deleted checked item.");
+        // console.log("Successfully deleted checked item.");
         res.redirect("/");
       }
     });
